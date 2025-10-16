@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Dashboard - EmployeeHub</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+            background: #f8f9fa;
+        }
+        
+        /* Generic UI primitives */
+        .btn { 
+            background: #f4f6f8; border: 1px solid #e2e8f0; color:#111; 
+            padding: .6rem 1rem; border-radius: 10px; cursor: pointer; 
+            transition: all .2s ease; font-weight: 600;
+        }
+        .btn:hover { background:#eef2f7; transform: translateY(-1px); }
+        .btn:active { transform: translateY(0); }
+        .btn-primary { background: linear-gradient(135deg,#2563eb,#3b82f6); color:#fff; border: none; }
+        .btn-primary:hover { filter: brightness(1.02); box-shadow: 0 6px 16px rgba(37,99,235,.25); }
+        .btn-outline { background:#fff; border:1px solid #dfe3e8; color:#374151; }
+        
+        input[type="text"], input[type="email"], select {
+            outline: none;
+        }
+        input[type="text"]:focus, input[type="email"]:focus, select:focus {
+            border-color:#2563eb !important; box-shadow: 0 0 0 4px rgba(37,99,235,.12);
+        }
+        
+        /* Subtle polish for cards */
+        .content-card { transition: box-shadow .2s ease, transform .2s ease; }
+        .content-card:hover { box-shadow: 0 10px 24px rgba(0,0,0,.06); transform: translateY(-2px); }
+        
+        /* Table aesthetics */
+        table { font-size: .95rem; }
+        tbody tr:nth-child(odd) { background:#fcfcfd; }
+        tbody tr:hover { background:#f5f7fb; }
+        th { color:#6b7280; font-weight:700; letter-spacing:.2px; }
+        
+        /* Small utility for statuses */
+        .status { font-size:.85rem; }
+        .status-ok { color:#16a34a; }
+        .status-err { color:#dc2626; }
+        .status-wait { color:#6b7280; }
+        
+        /* Role badge */
+        .role-badge { display:inline-block; padding:.2rem .5rem; border-radius:999px; font-size:.8rem; font-weight:600; }
+        .role-employee { background:#ecfeff; color:#0e7490; }
+        .role-manager { background:#eef2ff; color:#3730a3; }
+        .role-hr { background:#fef3c7; color:#92400e; }
+        
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 2rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #3498db, #2ecc71);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .nav-menu {
+            padding: 2rem 0;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 2rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+        }
+        
+        .dashboard-header {
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+        
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .card-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #ecf0f1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-body {
+            padding: 2rem;
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            transition: background 0.3s ease;
+        }
+        
+        .task-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <div>
+                        <div id="userName">Loading...</div>
+                        <div id="userRole" style="font-size: 0.875rem; opacity: 0.8;">Loading...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-section="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Dashboard
+                </a>
+                <a href="tasks-page.html" class="nav-item" data-section="tasks">
+                    <i class="fas fa-tasks"></i>
+                    My Tasks
+                </a>
+                <a href="#" class="nav-item" data-section="profile">
+                    <i class="fas fa-user"></i>
+                    Profile
+                </a>
+                <a href="#" class="nav-item" data-section="reports" id="reportsNav" style="display: none;">
+                    <i class="fas fa-chart-bar"></i>
+                    Reports
+                </a>
+                <a href="employees.html" class="nav-item" data-section="employees" id="employeesNav" style="display: none;">
+                    <i class="fas fa-users"></i>
+                    Employees
+                </a>
+                <a href="#" class="nav-item" data-section="settings" id="settingsNav" style="display: none;">
+                    <i class="fas fa-cog"></i>
+                    Settings
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="dashboard-header">
+                <div>
+                    <h1 id="welcomeMessage">Welcome back!</h1>
+                    <p id="currentDate"></p>
+                </div>
+                <div style="display:flex; align-items:center; gap:.5rem;">
+                    <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard Section -->
+            <div id="dashboardSection" class="content-section">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #3498db, #2980b9);">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <h3 id="totalTasks">12</h3>
+                        <p>Total Tasks</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #2ecc71, #27ae60);">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h3 id="completedTasks">8</h3>
+                        <p>Completed</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #f39c12, #e67e22);">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <h3 id="pendingTasks">4</h3>
+                        <p>Pending</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">
+                            <i class="fas fa-calendar"></i>
+                        </div>
+                        <h3 id="leaveBalance">15</h3>
+                        <p>Leave Days</p>
+                    </div>
+                </div>
+
+                <div class="content-grid">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h3>Employees</h3>
+                            <small id="empStatus" class="status status-wait"></small>
+                        </div>
+                        <div class="card-body">
+                            <div style="display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; margin-bottom:.75rem;">
+                                <input id="empName" type="text" placeholder="Name" style="flex:1 1 140px; padding:.6rem 1rem; border:1px solid #ccc; border-radius:10px;" />
+                                <input id="empEmail" type="email" placeholder="Email" style="flex:1 1 200px; padding:.6rem 1rem; border:1px solid #ccc; border-radius:10px;" />
+                                <select id="empRole" style="flex:0 0 140px; padding:.6rem 1rem; border:1px solid #ccc; border-radius:10px;">
+                                    <option value="employee">Employee</option>
+                                    <option value="manager">Manager</option>
+                                    <option value="hr">HR</option>
+                                </select>
+                                <button id="addEmpBtn" class="btn btn-primary" style="padding:.6rem 1rem;">Add</button>
+                            </div>
+                           
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load user data and initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            
+            if (!currentUser) {
+                window.location.href = 'index1.html';
+                return;
+            }
+            
+            // Update user info
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userRole').textContent = currentUser.role.toUpperCase();
+            document.getElementById('userAvatar').textContent = currentUser.name.charAt(0);
+            document.getElementById('welcomeMessage').textContent = `Welcome back, ${currentUser.name}!`;
+            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            // Show role-specific navigation
+            if (currentUser.role === 'admin' || currentUser.role === 'hr') {
+                document.getElementById('employeesNav').style.display = 'flex';
+                document.getElementById('settingsNav').style.display = 'flex';
+            }
+            
+            if (currentUser.role === 'admin' || currentUser.role === 'manager' || currentUser.role === 'hr') {
+                document.getElementById('reportsNav').style.display = 'flex';
+            }
+            
+        });
+        
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index1.html';
+        }
+
+        // --- Employees: count and add ---
+        const empStatus = document.getElementById('empStatus');
+        const empName = document.getElementById('empName');
+        const empEmail = document.getElementById('empEmail');
+        const empRole = document.getElementById('empRole');
+        const addEmpBtn = document.getElementById('addEmpBtn');
+
+        async function refreshEmployees() {
+            try {
+                empStatus.textContent = 'Loading...';
+                empStatus.className = 'status status-wait';
+                const res = await fetch('/employees');
+                const rows = await res.json();
+                empStatus.textContent = `${rows.length} employees`;
+                empStatus.className = 'status status-ok';
+            } catch (e) {
+                empStatus.textContent = 'Error';
+                empStatus.className = 'status status-err';
+            }
+        }
+
+        function escapeHtml(s){
+            return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
+        }
+        function roleClass(role){
+            if (role === 'manager') return 'role-manager';
+            if (role === 'hr') return 'role-hr';
+            return 'role-employee';
+        }
+
+        async function addEmployee() {
+            const name = empName.value.trim();
+            const email = empEmail.value.trim();
+            const role = empRole.value;
+            if (!name || !email || !role) { empStatus.textContent = 'Fill all fields'; return; }
+            try {
+                empStatus.textContent = 'Saving...';
+                empStatus.className = 'status status-wait';
+                const res = await fetch('/employees', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, role })
+                });
+                if (!res.ok) {
+                    const e = await res.json().catch(() => ({}));
+                    empStatus.textContent = e.error || 'Error';
+                    empStatus.className = 'status status-err';
+                    return;
+                }
+                empName.value = '';
+                empEmail.value = '';
+                empRole.value = 'employee';
+                await refreshEmployees();
+                empStatus.textContent = 'Saved';
+                empStatus.className = 'status status-ok';
+            } catch (e) {
+                empStatus.textContent = 'Error saving';
+                empStatus.className = 'status status-err';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshEmployees();
+            addEmpBtn.addEventListener('click', addEmployee);
+        });
+    </script>
+</body>
+</html>
