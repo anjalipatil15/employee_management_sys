@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profile - EmployeeHub</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+
+  <style>
+    /* Keep the same base layout and sidebar styles as dashboard */
+    body { margin: 0; font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji'; background: #f8f9fa; color: #2c3e50; }
+    .dashboard-container { display: flex; min-height: 100vh; background: #f8f9fa; }
+
+    .sidebar {
+      width: 280px;
+      background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+      color: white;
+      padding: 2rem 0;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    .sidebar-header { padding: 0 2rem 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .user-info { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+    .user-avatar {
+      width: 50px; height: 50px; background: linear-gradient(135deg, #3498db, #2ecc71);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; font-weight: bold;
+    }
+    .nav-menu { padding: 2rem 0; }
+    .nav-item {
+      display: flex; align-items: center; gap: 1rem; padding: 1rem 2rem;
+      color: rgba(255,255,255,0.8); text-decoration: none; transition: all 0.3s ease; cursor: pointer;
+    }
+    .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); color: white; }
+
+    .main-content { margin-left: 280px; flex: 1; padding: 2rem; }
+    .dashboard-header {
+      background: white; padding: 1.5rem 2rem; border-radius: 15px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .role-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: #ecf0f1; color: #2c3e50; padding: .5rem .75rem; border-radius: 9999px; font-weight: 600; font-size: .875rem;
+    }
+    .content-card {
+      background: white; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden;
+    }
+    .card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid #ecf0f1; display: flex; justify-content: space-between; align-items: center; }
+    .card-body { padding: 1.5rem; }
+    .profile-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 1.5rem; }
+    @media (max-width: 900px) { .profile-grid { grid-template-columns: 1fr; } }
+
+    .profile-summary {
+      display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1rem; padding: 1.5rem;
+    }
+    .profile-avatar {
+      width: 88px; height: 88px; border-radius: 50%;
+      background: linear-gradient(135deg, #3498db, #2ecc71);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; font-weight: 700;
+    }
+    .summary-name { font-size: 1.25rem; font-weight: 700; }
+    .summary-role { font-size: .9rem; opacity: .8; }
+
+    .details-table { width: 100%; border-collapse: collapse; }
+    .details-table th, .details-table td {
+      padding: .75rem 1rem; border-bottom: 1px solid #ecf0f1; text-align: left; vertical-align: top; font-size: .95rem;
+      word-break: break-word;
+    }
+    .details-table th { width: 220px; color: #7f8c8d; font-weight: 600; }
+    .empty-state { padding: 1rem; color: #7f8c8d; }
+
+    .btn {
+      border: none; border-radius: 8px; padding: .6rem 1rem; cursor: pointer; font-weight: 600; transition: background .2s ease, color .2s ease;
+    }
+    .btn-outline {
+      background: transparent; color: #2c3e50; border: 1px solid #dfe6e9;
+    }
+    .btn-outline:hover { background: #ecf0f1; }
+    .logout-btn {
+      background: #e74c3c; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; transition: background 0.3s ease;
+    }
+    .logout-btn:hover { background: #c0392b; }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+     Sidebar (kept the same) 
+    <aside class="sidebar" aria-label="Sidebar">
+      <div class="sidebar-header">
+        <div class="user-info">
+          <div class="user-avatar" id="userAvatar" aria-hidden="true">A</div>
+          <div>
+            <div id="userName">Loading...</div>
+            <div id="userRole" style="font-size: 0.875rem; opacity: 0.8;">Loading...</div>
+          </div>
+        </div>
+      </div>
+
+      <nav class="nav-menu" role="navigation" aria-label="Primary">
+        <a href="dashboard.html" class="nav-item" data-section="dashboard">
+          <i class="fas fa-tachometer-alt" aria-hidden="true"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="#" class="nav-item" data-section="tasks">
+          <i class="fas fa-tasks" aria-hidden="true"></i>
+          <span>My Tasks</span>
+        </a>
+        <a href="#" class="nav-item active" data-section="profile">
+          <i class="fas fa-user" aria-hidden="true"></i>
+          <span>Profile</span>
+        </a>
+        <a href="#" class="nav-item" data-section="reports" id="reportsNav" style="display: none;">
+          <i class="fas fa-chart-bar" aria-hidden="true"></i>
+          <span>Reports</span>
+        </a>
+        <a href="#" class="nav-item" data-section="employees" id="employeesNav" style="display: none;">
+          <i class="fas fa-users" aria-hidden="true"></i>
+          <span>Employees</span>
+        </a>
+        <a href="#" class="nav-item" data-section="settings" id="settingsNav" style="display: none;">
+          <i class="fas fa-cog" aria-hidden="true"></i>
+          <span>Settings</span>
+        </a>
+      </nav>
+    </aside>
+
+     Main Content 
+    <main class="main-content" role="main">
+      <header class="dashboard-header" aria-labelledby="profileTitle">
+        <div>
+          <h1 id="profileTitle">Profile</h1>
+          <p id="currentDate"></p>
+        </div>
+        <div style="display: flex; align-items: center; gap: .75rem;">
+          <span class="role-badge" id="roleBadge" aria-live="polite">
+            <i class="fas fa-id-badge" aria-hidden="true"></i>
+            <span id="roleText">ROLE</span>
+          </span>
+          <button class="logout-btn" onclick="logout()">
+            <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+            Logout
+          </button>
+        </div>
+      </header>
+
+      <section class="content-card" aria-labelledby="profileDetailsHeading">
+        <div class="card-header">
+          <h2 id="profileDetailsHeading" style="margin:0;">User Details</h2>
+          <div style="display:flex; gap:.5rem;">
+            <button class="btn btn-outline" type="button" onclick="location.reload()">Refresh</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="profile-grid">
+            <div class="profile-summary" aria-labelledby="profileSummaryHeading">
+              <div class="profile-avatar" id="profileAvatar" aria-hidden="true">A</div>
+              <div class="summary-name" id="summaryName">Loading...</div>
+              <div class="summary-role" id="summaryRole">Loading...</div>
+            </div>
+
+            <div>
+              <table class="details-table" aria-describedby="detailsHelp">
+                <tbody id="detailsBody">
+                  <tr><td colspan="2" class="empty-state">Loading user details…</td></tr>
+                </tbody>
+              </table>
+              <p id="detailsHelp" class="sr-only">This table lists all available user fields and their values.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // Initialize profile page using the same localStorage contract as the dashboard
+    document.addEventListener('DOMContentLoaded', function () {
+      const currentUserRaw = localStorage.getItem('currentUser');
+      if (!currentUserRaw) {
+        // no session -> redirect to login as in dashboard
+        window.location.href = 'index1.html';
+        return;
+      }
+
+      const currentUser = JSON.parse(currentUserRaw);
+
+      // Header date
+      document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      });
+
+      // Update sidebar user info (keep same behavior)
+      document.getElementById('userName').textContent = currentUser.name || 'Unknown';
+      document.getElementById('userRole').textContent = (currentUser.role || '').toString().toUpperCase() || 'N/A';
+      document.getElementById('userAvatar').textContent = (currentUser.name || 'U').charAt(0).toUpperCase();
+
+      // Role-based nav visibility (same logic as dashboard)
+      if (currentUser.role === 'admin' || currentUser.role === 'hr') {
+        document.getElementById('employeesNav').style.display = 'flex';
+        document.getElementById('settingsNav').style.display = 'flex';
+      }
+      if (currentUser.role === 'admin' || currentUser.role === 'manager' || currentUser.role === 'hr') {
+        document.getElementById('reportsNav').style.display = 'flex';
+      }
+
+      // Profile header role badge
+      document.getElementById('roleText').textContent = (currentUser.role || 'N/A').toString().toUpperCase();
+
+      // Summary block
+      document.getElementById('profileAvatar').textContent = (currentUser.name || 'U').charAt(0).toUpperCase();
+      document.getElementById('summaryName').textContent = currentUser.name || 'Unknown';
+      document.getElementById('summaryRole').textContent = (currentUser.role || 'N/A').toString().toUpperCase();
+
+      // Render all details dynamically
+      const detailsBody = document.getElementById('detailsBody');
+      detailsBody.innerHTML = ''; // clear
+
+      const entries = Object.entries(currentUser);
+      if (entries.length === 0) {
+        detailsBody.innerHTML = '<tr><td colspan="2" class="empty-state">No user details available.</td></tr>';
+      } else {
+        // Show every field from the currentUser object
+        entries.forEach(([key, value]) => {
+          const prettyKey = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+          const displayValue = typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value);
+          const row = document.createElement('tr');
+
+          const th = document.createElement('th');
+          th.scope = 'row';
+          th.textContent = prettyKey;
+
+          const td = document.createElement('td');
+          const pre = document.createElement('pre');
+          pre.style.margin = 0;
+          pre.style.whiteSpace = 'pre-wrap';
+          pre.textContent = displayValue;
+          td.appendChild(pre);
+
+          row.appendChild(th);
+          row.appendChild(td);
+          detailsBody.appendChild(row);
+        });
+      }
+    });
+
+    function logout() {
+      localStorage.removeItem('currentUser');
+      window.location.href = 'index1.html';
+    }
+  </script>
+</body>
+</html>
