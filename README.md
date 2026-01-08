@@ -1,4 +1,4 @@
-# Employee Management System (Primo)
+# Employee Management System
 
 A small demo Employee Management System built with Node.js, Express and SQLite. The project provides a simple login flow (demo users), a dashboard, profile view, tasks page and basic employees CRUD endpoints backed by a local SQLite database.
 
@@ -95,3 +95,4 @@ The server uses a local SQLite file `database.db` (created automatically when th
 
 - If a port is already in use, either free port 3000 or edit `server.js` to change the port.
 - If frontend pages show blank/redirect to login, check `localStorage.currentUser` in your browser devtools — the app expects a `currentUser` object after login.
+- Reach out for any other queries
