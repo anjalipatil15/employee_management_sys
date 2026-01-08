@@ -4,8 +4,6 @@ A small demo Employee Management System built with Node.js, Express and SQLite. 
 
 This repository is intended as a lightweight demo and learning project — not production-ready. It includes demo credentials and stores passwords in plaintext for convenience.
 
----
-
 ## Quick overview
 
 - Server: Express (serves static files from the project root)
